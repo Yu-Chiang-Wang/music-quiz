@@ -1,5 +1,7 @@
 # 樂理闖關
 
+網站：https://yu-chiang-wang.github.io/music-quiz/
+
 給學生自學用的音樂史、樂理問答遊戲（闖關、閃卡、累積點數）。
 
 - 題庫：Google 試算表（`index.html` 內的 `SHEET_ID`）。試算表讀不到時，改用 `questions.csv`。
