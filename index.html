@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>樂理闖關</title>
+<meta name="description" content="音樂史、樂理與術科題型的自學問答遊戲。">
+<meta name="theme-color" content="#F4F5F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101318" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="樂理闖關">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233048B8'/%3E%3Cpath d='M26 44V18l18-4v24' stroke='white' stroke-width='4' fill='none'/%3E%3Ccircle cx='21' cy='44' r='6' fill='white'/%3E%3Ccircle cx='39' cy='38' r='6' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* 單欄、手機優先。五線譜細線是唯一的裝飾元素 */
+:root{
+  --bg:#F4F5F7;--surface:#FFFFFF;--sunk:#EEF0F3;--ink:#15181E;--muted:#646B78;--line:#E2E5EA;
+  --accent:#3048B8;--accent-soft:#E9ECF8;--on-accent:#FFFFFF;
+  --good:#18794E;--good-soft:#E4F2EA;--bad:#B83A2E;--bad-soft:#F7E7E4;
+  --display:"Noto Serif TC","Songti TC",serif;--body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;--num:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --r:16px;--shadow:0 1px 2px rgba(21,24,30,.04),0 4px 16px rgba(21,24,30,.05);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#101318;--surface:#181C23;--sunk:#13171D;--ink:#E8EBF0;--muted:#99A1AE;--line:#272D37;
+  --accent:#8FA3F0;--accent-soft:#1D2540;--on-accent:#0E1220;
+  --good:#5DC08E;--good-soft:#132B22;--bad:#EE8C80;--bad-soft:#341C1A;
+  --shadow:0 1px 2px rgba(0,0,0,.3);color-scheme:dark}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.65;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+img{max-width:100%}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit}
+#app{max-width:600px;margin:0 auto;padding-block:20px 40px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:20px}
+h1,h2{font-family:var(--display);font-weight:700;margin:0;line-height:1.3;text-wrap:balance}
+.mono{font-family:var(--num);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted);font-size:.875rem}
+.label{font-size:.75rem;letter-spacing:.12em;color:var(--muted)}
+
+/* 頁首 */
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:1.15rem}
+.brand svg{flex:none}
+.pts{font-family:var(--num);font-size:.875rem;padding:6px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line);white-space:nowrap}
+
+/* 等級面板 */
+.hero{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);padding:24px 20px 0;display:flex;flex-direction:column;gap:20px;overflow:hidden}
+.lvrow{display:flex;align-items:center;gap:20px}
+.ring{position:relative;width:96px;height:96px;flex:none}
+.ring svg{transform:rotate(-90deg)}
+.ring .in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.2}
+.ring .in b{font-family:var(--display);font-size:1.15rem}
+.lvtext{display:flex;flex-direction:column;gap:2px;min-width:0}
+.lvtext .big{font-family:var(--num);font-size:2rem;line-height:1.1}
+.staff{height:25px;background:repeating-linear-gradient(to bottom,var(--line) 0 1px,transparent 1px 6px);margin:0 -20px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);margin:0 -20px}
+.stats div{padding:14px 8px;text-align:center;display:flex;flex-direction:column;gap:2px}
+.stats div+div{border-left:1px solid var(--line)}
+.stats strong{font-family:var(--num);font-size:1.15rem;font-weight:500}
+
+/* 分類切換 */
+.seg{display:flex;gap:4px;padding:4px;background:var(--sunk);border-radius:12px;overflow-x:auto;scrollbar-width:none}
+.seg button{flex:1;white-space:nowrap;border:0;background:transparent;padding:8px 12px;border-radius:9px;cursor:pointer;font-size:.9rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);font-weight:500;box-shadow:var(--shadow)}
+
+/* 模式 */
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mode{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:20px 18px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow)}
+.mode .t{font-family:var(--display);font-size:1.2rem;font-weight:700}
+.mode .d{font-size:.85rem;color:var(--muted);line-height:1.5}
+.mode.primary{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.mode.primary .d{color:var(--bg);opacity:.7}
+.listbtn{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:14px 16px;cursor:pointer;text-align:left}
+.listbtn .n{font-family:var(--num);color:var(--bad)}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center}
+.link{border:0;background:none;padding:4px 0;color:var(--muted);font-size:.85rem;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.link.warn{color:var(--bad)}
+
+/* 作答 */
+.qbar{display:flex;align-items:center;gap:12px}
+.icon{border:0;background:var(--surface);width:36px;height:36px;border-radius:50%;display:grid;place-items:center;cursor:pointer;border:1px solid var(--line);flex:none}
+.prog{flex:1;display:flex;gap:3px}
+.prog i{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.prog i.ok{background:var(--good)}.prog i.no{background:var(--bad)}.prog i.now{background:var(--accent)}
+.lives{display:flex;gap:4px}
+.lives i{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.lives i.off{background:var(--line)}
+.card{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);padding:22px 20px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.meta{display:flex;align-items:center;gap:10px;font-size:.8rem;color:var(--muted)}
+.meta .cat{color:var(--accent);font-weight:500;letter-spacing:.06em}
+.diff{display:inline-flex;gap:3px}.diff i{width:6px;height:6px;border-radius:50%;background:var(--line)}.diff i.on{background:var(--accent)}
+.qtext{font-size:1.1rem;font-weight:500;line-height:1.6;white-space:pre-wrap}
+.score{color:var(--ink);overflow-x:auto;background:var(--sunk);border-radius:12px;padding:8px}
+.score svg{display:block;margin:0 auto}
+.media img{display:block;border-radius:12px;border:1px solid var(--line)}
+.media audio{width:100%}
+.play{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;padding:9px 18px 9px 14px;border-radius:999px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-weight:500;cursor:pointer}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;gap:14px;align-items:center;width:100%;text-align:left;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;line-height:1.5}
+.opt .k{font-family:var(--num);font-size:.8rem;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);color:var(--muted);flex:none}
+.opt.ok{border-color:var(--good);background:var(--good-soft)}.opt.ok .k{background:var(--good);border-color:var(--good);color:var(--surface)}
+.opt.no{border-color:var(--bad);background:var(--bad-soft)}.opt.no .k{background:var(--bad);border-color:var(--bad);color:var(--surface)}
+.opt.dim{opacity:.55}
+.opt:disabled{cursor:default;color:inherit}
+.fb{display:flex;flex-direction:column;gap:6px;padding:16px;border-radius:12px;background:var(--sunk)}
+.fb .h{font-weight:700;display:flex;justify-content:space-between;gap:8px}
+.fb.ok .h{color:var(--good)}.fb.no .h{color:var(--bad)}
+.fb .gain{font-family:var(--num);font-weight:500}
+.dock{position:sticky;bottom:0;padding-block:12px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--bg) 70%,transparent);margin-bottom:-40px}
+.btn{display:block;width:100%;border:0;border-radius:12px;padding:14px 18px;font-weight:500;cursor:pointer;background:var(--accent);color:var(--on-accent);text-align:center}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.4;cursor:default}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* 閃卡 */
+.answer{display:flex;flex-direction:column;gap:6px;padding:16px;border-radius:12px;background:var(--good-soft)}
+.answer b{color:var(--good);font-size:1.05rem}
+
+/* 結果 */
+.result{text-align:center;align-items:center;padding-block:32px}
+.result .big{font-family:var(--num);font-size:3rem;line-height:1}
+.result .row{display:flex;gap:32px;justify-content:center}
+.result .row div{display:flex;flex-direction:column;gap:6px}
+
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (max-width:400px){.modes{grid-template-columns:1fr}.lvrow{gap:16px}}
+@media (prefers-reduced-motion:no-preference){
+  .opt,.seg button,.mode{transition:background .15s,border-color .15s,transform .1s}
+  .opt:active:not(:disabled),.mode:active,.btn:active{transform:scale(.98)}
+  .fb,.answer{animation:up .25s ease-out}
+  .opt.ok{animation:pop .3s ease-out}
+  .ring circle.p{transition:stroke-dashoffset .6s ease-out}
+  @keyframes up{from{opacity:0;transform:translateY(6px)}}
+  @keyframes pop{50%{transform:scale(1.02)}}
+}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script src="vendor/abcjs-basic-min.js"></script>
+<script>
+/* ===== 設定：題庫試算表 ===== */
+var SHEET_ID="185Cij4GoOTQ9IkAizazz1MiVz6bGdi0hOyNlvURPQ8A";
+var SHEET_NAME="題庫";
+</script>
+<script>
+(function(){
+"use strict";
+var CAT={"史":"音樂史","理":"樂理","考":"術科題型"},CAT_R={"音樂史":"史","樂理":"理","術科題型":"考"};
+var LV=[[0,"新手"],[100,"練習生"],[300,"團員"],[700,"首席"],[1500,"大師"]];
+function sget(k,d){try{var v=localStorage.getItem("mq_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}}
+function sset(k,v){try{localStorage.setItem("mq_"+k,JSON.stringify(v))}catch(e){}}
+var S={pts:sget("pts",0),done:sget("done",0),right:sget("right",0),wrong:sget("wrong",[]),known:sget("known",[]),cat:sget("cat","全部")};
+function save(){["pts","done","right","wrong","known","cat"].forEach(function(k){sset(k,S[k])})}
+var Q=sget("bank",null)||[];
+var bankState=Q.length?"cached":"loading";
+var app=document.getElementById("app");
+var view="home";
+
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function byId(id){for(var i=0;i<Q.length;i++)if(Q[i].id===id)return Q[i];return null}
+function pool(){return Q.filter(function(q){return S.cat==="全部"||CAT[q.c]===S.cat})}
+function level(p){var cur=LV[0],nx=null;for(var i=0;i<LV.length;i++)if(p>=LV[i][0]){cur=LV[i];nx=LV[i+1]||null}return{name:cur[1],next:nx,pct:nx?(p-cur[0])/(nx[0]-cur[0]):1}}
+
+/* ===== 讀取試算表 ===== */
+function parseCSV(t){var rows=[],row=[],f="",q=false;for(var i=0;i<t.length;i++){var c=t[i];if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}else if(c==='"')q=true;else if(c===","){row.push(f);f=""}else if(c==="\n"||c==="\r"){if(c==="\r"&&t[i+1]==="\n")i++;row.push(f);rows.push(row);row=[];f=""}else f+=c}if(f!==""||row.length){row.push(f);rows.push(row)}return rows}
+function rowsToQ(rows){
+  var h=rows[0].map(function(x){return x.trim()});
+  function col(name){for(var i=0;i<h.length;i++)if(h[i].indexOf(name)===0)return i;return -1}
+  var I={id:col("編號"),c:col("類別"),d:col("難度"),q:col("題目"),A:col("選項A"),B:col("選項B"),C:col("選項C"),D:col("選項D"),a:col("答案"),e:col("解析"),abc:col("樂譜"),n:col("播放音"),m:col("播放方式"),img:col("圖片"),au:col("音檔"),st:col("狀態")};
+  var out=[];
+  rows.slice(1).forEach(function(r){
+    function g(k){return I[k]<0?"":String(r[I[k]]||"").trim()}
+    var id=parseInt(g("id"),10),qt=g("q"),c=CAT_R[g("c")];
+    var raw=[g("A"),g("B"),g("C"),g("D")],ai="ABCD".indexOf(g("a").toUpperCase());
+    if(!id||!qt||!c||ai<0||!raw[ai]||g("st")==="暫停")return;
+    var o=[],a=0;raw.forEach(function(t,i){if(t){if(i===ai)a=o.length;o.push(t)}});
+    if(o.length<2)return;
+    var q={id:id,c:c,d:Math.min(3,Math.max(1,parseInt(g("d"),10)||1)),q:qt,o:o,a:a,e:g("e")};
+    if(g("abc"))q.abc=g("abc");
+    var n=g("n").split(/\s+/).filter(function(x){return midi(x)!=null});if(n.length){q.n=n;q.m=g("m")==="依序"?"m":"h"}
+    if(g("img"))q.img=g("img");if(g("au"))q.au=g("au");
+    out.push(q);
+  });
+  return out;
+}
+function loadBank(){
+  var url="https://docs.google.com/spreadsheets/d/"+SHEET_ID+"/gviz/tq?tqx=out:csv&headers=1&sheet="+encodeURIComponent(SHEET_NAME)+"&t="+Date.now();
+  function use(t){var list=rowsToQ(parseCSV(t));if(!list.length)throw 0;Q=list;sset("bank",Q)}
+  function get(u){return fetch(u).then(function(r){if(!r.ok)throw 0;return r.text()})}
+  get(url).then(function(t){use(t);bankState="fresh"})
+  .catch(function(){return get("questions.csv?t="+Date.now()).then(function(t){use(t);bankState="backup"})})
+  .catch(function(){bankState=Q.length?"offline":"error"}).then(function(){if(view==="home")home()});
+}
+
+/* ===== 聲音合成 ===== */
+var ctx=null;
+function midi(s){var m=/^([A-Ga-g])([#b]?)(-?\d)$/.exec(String(s).trim());if(!m)return null;return {C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1].toUpperCase()]+(m[2]==="#"?1:m[2]==="b"?-1:0)+(parseInt(m[3],10)+1)*12}
+function playNotes(notes,mode){
+  try{ctx=ctx||new(window.AudioContext||window.webkitAudioContext)();ctx.resume()}catch(e){return}
+  var ms=notes.map(midi).filter(function(x){return x!=null});if(!ms.length)return;
+  var master=ctx.createGain();master.gain.value=mode==="h"?0.5/ms.length:0.45;master.connect(ctx.destination);
+  var t0=ctx.currentTime+0.05;
+  ms.forEach(function(m,i){var t=mode==="h"?t0:t0+i*0.6,dur=mode==="h"?2.2:1.1,f=440*Math.pow(2,(m-69)/12);
+    [[1,1],[2,0.35],[3,0.12]].forEach(function(p){var o=ctx.createOscillator(),g=ctx.createGain();o.type="sine";o.frequency.value=f*p[0];g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(p[1],t+0.012);g.gain.exponentialRampToValueAtTime(0.0008,t+dur);o.connect(g);g.connect(master);o.start(t);o.stop(t+dur+0.05)})});
+}
+
+/* ===== 共用元件 ===== */
+var NOTE='<svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="var(--accent)"/><path d="M26 44V18l18-4v24" stroke="var(--on-accent)" stroke-width="4" fill="none"/><circle cx="21" cy="44" r="6" fill="var(--on-accent)"/><circle cx="39" cy="38" r="6" fill="var(--on-accent)"/></svg>';
+var X='<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+function header(){return '<header class="top"><div class="brand">'+NOTE+'樂理闖關</div><div class="pts">'+S.pts+' 點</div></header>'}
+function diff(d){var h="";for(var i=1;i<=3;i++)h+='<i class="'+(i<=d?"on":"")+'"></i>';return '<span class="diff" title="難度">'+h+'</span>'}
+function fullAbc(a){var h="X:1\nL:1/4\n";if(!/^K:/m.test(a))h+="K:C\n";return h+a}
+function drawScore(el,abc){if(!window.ABCJS){el.textContent="樂譜無法載入，請重新整理頁面。";return}try{window.ABCJS.renderAbc(el,fullAbc(abc),{staffwidth:250,scale:1.25,paddingtop:4,paddingbottom:4,paddingleft:4,paddingright:4,foregroundColor:"currentColor"})}catch(e){el.textContent="樂譜格式有誤。"}}
+function body(q){
+  var h='<div class="meta"><span class="cat">'+CAT[q.c]+'</span>'+diff(q.d)+'</div><div class="qtext">'+esc(q.q)+'</div>';
+  if(q.img)h+='<div class="media"><img alt="題目附圖" src="'+esc(q.img)+'"></div>';
+  if(q.abc&&!q.img)h+='<div class="score" data-abc></div>';
+  if(q.au)h+='<div class="media"><audio controls preload="none" src="'+esc(q.au)+'"></audio></div>';
+  if(q.n&&!q.au)h+='<button class="play" data-play><svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5v11l9-5.5z" fill="currentColor"/></svg>'+(q.abc?"彈奏譜例":"播放聲音")+'</button>';
+  return h;
+}
+function bind(root,q){var s=root.querySelector("[data-abc]");if(s)drawScore(s,q.abc);var p=root.querySelector("[data-play]");if(p)p.onclick=function(){playNotes(q.n,q.m)}}
+
+/* ===== 首頁 ===== */
+var armReset=false;
+function home(){
+  view="home";
+  var lv=level(S.pts),rate=S.done?Math.round(S.right/S.done*100):0,C=2*Math.PI*42;
+  var bankMsg={loading:"題庫載入中…",cached:"題庫更新中…",fresh:"題庫已是最新",backup:"使用內建題庫",offline:"目前離線，使用上次的題庫",error:"題庫載入失敗，請檢查網路後重新整理"}[bankState];
+  app.innerHTML=header()+
+  '<section class="hero"><div class="lvrow"><div class="ring"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="42" fill="none" stroke="var(--accent-soft)" stroke-width="6"/><circle class="p" cx="48" cy="48" r="42" fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+(C*(1-lv.pct))+'"/></svg><div class="in"><span class="label">等級</span><b>'+lv.name+'</b></div></div>'+
+  '<div class="lvtext"><span class="label">累積點數</span><span class="big">'+S.pts+'</span><span class="muted">'+(lv.next?"再 "+(lv.next[0]-S.pts)+" 點升為「"+lv.next[1]+"」":"已達最高等級")+'</span></div></div>'+
+  '<div class="stats"><div><strong>'+S.done+'</strong><span class="muted">已答題數</span></div><div><strong>'+rate+'%</strong><span class="muted">正確率</span></div><div><strong>'+S.known.length+'</strong><span class="muted">閃卡記住</span></div></div></section>'+
+  '<div class="seg" role="group" aria-label="題目範圍">'+["全部","音樂史","樂理","術科題型"].map(function(c){return '<button data-cat="'+c+'" aria-pressed="'+(S.cat===c)+'">'+c+'</button>'}).join("")+'</div>'+
+  '<div class="modes"><button class="mode primary" id="go-quiz"'+(pool().length?"":" disabled")+'><span class="t">闖關</span><span class="d">每輪 10 題、3 次機會，答對累積點數</span></button><button class="mode" id="go-flash"'+(pool().length?"":" disabled")+'><span class="t">閃卡</span><span class="d">翻卡複習，記住一張得 3 點</span></button></div>'+
+  (S.wrong.length?'<button class="listbtn" id="go-wrong"><span>複習錯題</span><span class="n">'+S.wrong.length+' 題 ›</span></button>':"")+
+  '<div class="foot"><span class="muted">'+bankMsg+(Q.length?"・"+(S.cat==="全部"?"共":S.cat)+" "+pool().length+" 題":"")+'</span><button class="link'+(armReset?" warn":"")+'" id="reset">'+(armReset?"確定要清除？再按一次":"清除我的紀錄")+'</button></div>'+
+  '<p class="muted">答對依難度得 10、20、30 點；連續答對 3 題以上，每題再加 5 點。紀錄只存在這台裝置的瀏覽器中。</p>';
+  app.querySelectorAll("[data-cat]").forEach(function(b){b.onclick=function(){S.cat=b.dataset.cat;save();home()}});
+  app.querySelector("#go-quiz").onclick=function(){startQuiz(false)};
+  app.querySelector("#go-flash").onclick=startFlash;
+  var w=app.querySelector("#go-wrong");if(w)w.onclick=function(){startQuiz(true)};
+  app.querySelector("#reset").onclick=function(){if(!armReset){armReset=true;home();return}armReset=false;S.pts=0;S.done=0;S.right=0;S.wrong=[];S.known=[];save();home()};
+}
+
+/* ===== 闖關 ===== */
+var R=null;
+function startQuiz(review){
+  var list=review?S.wrong.map(byId).filter(Boolean):shuffle(pool()).slice(0,10);
+  if(!list.length){S.wrong=[];save();home();return}
+  R={list:list.map(function(q){return q.id}),res:[],i:0,lives:review?-1:3,gain:0,streak:0,ok:0,review:review};
+  showQ();
+}
+function qbar(){
+  var p=R.list.map(function(_,i){return '<i class="'+(R.res[i]===true?"ok":R.res[i]===false?"no":i===R.i?"now":"")+'"></i>'}).join("");
+  var l=R.lives<0?"":'<span class="lives" aria-label="剩餘 '+R.lives+' 次機會">'+[0,1,2].map(function(i){return '<i class="'+(i<R.lives?"":"off")+'"></i>'}).join("")+'</span>';
+  return '<div class="qbar"><button class="icon" id="quit" aria-label="結束這一輪">'+X+'</button><div class="prog">'+p+'</div>'+l+'</div>';
+}
+function showQ(){
+  view="quiz";
+  var q=byId(R.list[R.i]),order=shuffle(q.o.map(function(_,i){return i}));
+  app.innerHTML=qbar()+'<section class="card" id="qc">'+body(q)+'<div class="opts">'+order.map(function(oi,k){return '<button class="opt" data-oi="'+oi+'"><span class="k">'+"ABCD"[k]+'</span><span>'+esc(q.o[oi])+'</span></button>'}).join("")+'</div><div id="fb"></div></section><div class="dock" id="dock" hidden></div>';
+  bind(app.querySelector("#qc"),q);
+  app.querySelector("#quit").onclick=endQuiz;
+  app.querySelectorAll(".opt").forEach(function(b){b.onclick=function(){answer(q,+b.dataset.oi)}});
+  window.scrollTo(0,0);
+}
+function answer(q,oi){
+  var ok=oi===q.a,add=0;
+  app.querySelectorAll(".opt").forEach(function(b){b.disabled=true;var x=+b.dataset.oi;b.classList.add(x===q.a?"ok":x===oi?"no":"dim")});
+  S.done++;R.res[R.i]=ok;
+  if(ok){S.right++;R.ok++;R.streak++;add=10*q.d+(R.streak>=3?5:0);S.pts+=add;R.gain+=add;S.wrong=S.wrong.filter(function(id){return id!==q.id})}
+  else{R.streak=0;if(R.lives>0)R.lives--;if(S.wrong.indexOf(q.id)<0)S.wrong.push(q.id)}
+  save();
+  var last=R.i>=R.list.length-1||R.lives===0;
+  app.querySelector(".qbar").outerHTML=qbar();app.querySelector("#quit").onclick=endQuiz;
+  app.querySelector("#fb").innerHTML='<div class="fb '+(ok?"ok":"no")+'"><div class="h"><span>'+(ok?"答對了":"正確答案："+esc(q.o[q.a]))+'</span>'+(ok?'<span class="gain">+'+add+(R.streak>=3?"・連對 "+R.streak:"")+'</span>':"")+'</div><div>'+esc(q.e)+'</div></div>';
+  var d=app.querySelector("#dock");d.hidden=false;d.innerHTML='<button class="btn" id="next">'+(last?"查看結果":"下一題")+'</button>';
+  var nb=d.querySelector("#next");nb.onclick=function(){if(last)endQuiz();else{R.i++;showQ()}};nb.focus({preventScroll:true});
+}
+function endQuiz(){
+  view="end";
+  var n=R.res.filter(function(x){return x!=null}).length,lv=level(S.pts),rv=R.review;
+  app.innerHTML=header()+'<section class="card result"><span class="label">'+(R.lives===0?"機會用完了":"這一輪結束")+'</span><div class="row"><div><span class="big">'+R.ok+'<span class="muted">/'+n+'</span></span><span class="muted">答對</span></div><div><span class="big">+'+R.gain+'</span><span class="muted">點數</span></div></div><span class="muted">總點數 '+S.pts+'・'+lv.name+(lv.next?"・距離「"+lv.next[1]+"」還差 "+(lv.next[0]-S.pts)+" 點":"")+'</span></section>'+
+  '<div class="pair"><button class="btn ghost" id="back">回首頁</button><button class="btn" id="again">'+(rv?"繼續複習錯題":"再玩一輪")+'</button></div>';
+  app.querySelector("#again").onclick=function(){startQuiz(rv)};
+  app.querySelector("#back").onclick=home;
+  window.scrollTo(0,0);
+}
+
+/* ===== 閃卡 ===== */
+var F=null;
+function startFlash(){var l=pool();if(!l.length)return;F={list:shuffle(l).map(function(q){return q.id}),i:0,flip:false};showF()}
+function showF(){
+  view="flash";
+  var q=byId(F.list[F.i]),known=S.known.indexOf(q.id)>=0;
+  var pct=Math.round((F.i+1)/F.list.length*100);
+  app.innerHTML='<div class="qbar"><button class="icon" id="quit" aria-label="離開閃卡">'+X+'</button><div class="prog"><i class="now" style="flex:none;width:'+pct+'%"></i><i style="flex:1"></i></div><span class="muted mono">'+(F.i+1)+'/'+F.list.length+'</span></div>'+
+  '<section class="card" id="fc">'+body(q)+(F.flip?'<div class="answer"><b>'+esc(q.o[q.a])+'</b><span>'+esc(q.e)+'</span></div>':"")+'</section>'+
+  '<div class="dock">'+(F.flip?'<div class="pair"><button class="btn ghost" id="again">再看一次</button><button class="btn" id="got">'+(known?"記得了":"記得了 +3")+'</button></div>':'<button class="btn" id="flip">翻面看答案</button>')+'</div>';
+  bind(app.querySelector("#fc"),q);
+  app.querySelector("#quit").onclick=home;
+  var b;
+  if((b=app.querySelector("#flip")))b.onclick=function(){F.flip=true;showF()};
+  if((b=app.querySelector("#again")))b.onclick=function(){F.list.push(q.id);next()};
+  if((b=app.querySelector("#got")))b.onclick=function(){if(!known){S.known.push(q.id);S.pts+=3;save()}next()};
+  function next(){if(F.i>=F.list.length-1){flashEnd();return}F.i++;F.flip=false;showF();window.scrollTo(0,0)}
+}
+function flashEnd(){
+  view="end";
+  app.innerHTML=header()+'<section class="card result"><span class="label">這一疊看完了</span><span class="big">'+S.known.length+'<span class="muted">/'+Q.length+'</span></span><span class="muted">已記住的閃卡</span></section><div class="pair"><button class="btn ghost" id="back">回首頁</button><button class="btn" id="again">再翻一次</button></div>';
+  app.querySelector("#again").onclick=startFlash;app.querySelector("#back").onclick=home;
+}
+
+home();
+loadBank();
+})();
+</script>
+</body>
+</html>
